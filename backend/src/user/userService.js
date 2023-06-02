@@ -11,26 +11,21 @@ module.exports.getDataFromDBService = () =>{
     })
 }
 
-module.exports.getCountriesFromDBService = (regionName="")=>{
-    return new Promise(function (resolve, reject){
-        try {
-            let myList = []
-            let result = userModel.regions.find({name: regionName.name}).toArray()
-            result.then((hamVeri) => myList.push(hamVeri)).then(()=> {
-                let result2 = userModel.listings.find({
-                    'address.location': {
-                        '$geoWithin': {
-                            '$geometry': {
-                                'type': myList[0][0]['geometry']['type'],
-                                'coordinates': myList[0][0]['geometry']['coordinates']
+module.exports.getCountriesFromDBService =  (regionName)=>{
+        return new Promise((resolve, reject)=>{
+            try {
+                userModel.regions.find({name: regionName.name}).toArray().then(datam => datam = datam[0]).then(datam => datam = datam.geometry).then((data)=>{
+                    let result = userModel.listings.find({
+                        'address.location': {
+                            '$geoWithin': {
+                                '$geometry': data
                             }
                         }
-                    }
-                }).toArray()
-                resolve(result2)
-            })
-
-        } catch (error) {
-            reject(false)
-        }
-})}
+                    }).limit(20).toArray()
+                    resolve(result)
+                })
+            } catch (error) {
+                reject(false)
+            }
+        })
+}

@@ -6,8 +6,13 @@ const getUserControllerFn = async (req, res) =>{
 }
 
 const getCountriesControllerFn = async (req, res) =>{
-    let data = await userService.getCountriesFromDBService(req.body);
-    res.send({ "status": true, "data": data })
+    try {
+        let data = await userService.getCountriesFromDBService(req.body);
+        res.send({ "status": true, "data": data })
+    } catch (error) {
+        console.error(error)
+        process.exit(1)
+    }
 }
 
 
